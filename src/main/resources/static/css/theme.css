@@ -1,0 +1,43 @@
+@charset "ISO-8859-1";
+/* theme.css */
+
+body {
+    background-color: #f0f2f5;
+    color: #333;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.card, .form-control, .btn {
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #18191a;
+    color: #e4e6eb;
+}
+
+body.dark-mode .card {
+    background-color: #242526;
+    color: #e4e6eb;
+    border-color: #3a3b3c;
+}
+
+body.dark-mode .form-control {
+    background-color: #3a3b3c;
+    color: #e4e6eb;
+    border-color: #555;
+}
+
+body.dark-mode .form-control::placeholder {
+    color: #aaa;
+}
+
+body.dark-mode .btn-outline-primary {
+    color: #ddd;
+    border-color: #888;
+}
+
+body.dark-mode .btn-outline-primary:hover {
+    background-color: #3a3b3c;
+}

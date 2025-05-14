@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Chat - ChatMe</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+.chat-box {
+	height: 500px;
+	overflow-y: scroll;
+	border: 1px solid #ccc;
+	padding: 15px;
+	background: #f9f9f9;
+}
+
+.msg-sent {
+	background-color: #d1f5d3; /* Light green */
+	color: #000;
+	padding: 10px 15px;
+	margin: 8px 0;
+	border-radius: 18px 18px 0 18px;
+	max-width: 75%;
+	align-self: flex-end;
+	display: inline-block;
+	float: right;
+	clear: both;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.msg-received {
+	background-color: #e0e0e0; /* Light grey */
+	color: #000;
+	padding: 10px 15px;
+	margin: 8px 0;
+	border-radius: 18px 18px 18px 0;
+	max-width: 75%;
+	align-self: flex-start;
+	display: inline-block;
+	float: left;
+	clear: both;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+body {
+	background-color: #f4f6f9;
+}
+
+.profile-card {
+	background: white;
+	padding: 2rem;
+	border-radius: 1rem;
+	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+	margin-top: 60px;
+}
+
+.profile-img {
+	width: 120px;
+	height: 120px;
+	object-fit: cover;
+	border-radius: 50%;
+	margin-bottom: 1rem;
+}
+
+.username {
+	font-size: 1.5rem;
+	font-weight: 600;
+}
+
+.info {
+	font-size: 1rem;
+	color: #555;
+}
+/* Chat Header Fixed at the Top */
+.chat-header {
+    position: fixed;
+    top: 60px; /* Adjust this depending on your navbar height */
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    padding: 10px 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Adds a small shadow */
+    z-index: 1050; /* Higher than the navbar to ensure it's visible */
+    text-align: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+body {
+    padding-top: 100px; /* Adds space for the fixed header */
+}
+
+</style>
+
+<link rel="stylesheet" th:href="@{/css/theme.css}">
+
+</head>
+<body>
+	
+
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+		<div class="container-fluid">
+			<a class="navbar-brand" >chaMe</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav"
+				aria-controls="navbarNav" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNav">
+				<ul class="navbar-nav ms-auto">
+					<li class="nav-item"><a class="nav-link" th:href="@{/myFriends}">My
+							Friends</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/logout}">Log
+							Out</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/allUsers}">All
+							Users</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/feed}">Feed</a>
+					</li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/friendRequests}">Friend
+							Requests</a></li>
+					<li class="nav-item"><a class="nav-link" th:href="@{/myPosts}">My
+							Posts</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<br />
+	<br />
+	<br />
+	<div class="chat-header">
+    <h3>
+        Chat with <span id="friendUsermail" th:text="${friendEmail}"></span>
+    </h3>
+</div>
+	<div class="container mt-4">
+		<div id="chat-box" class="chat-box mb-3">
+			<div th:each="msg : ${messages}">
+				<div
+					th:class="${msg.sender == currentUserEmail} ? 'msg-sent' : 'msg-received'">
+					<strong th:text="${msg.sender} + ':'"></strong> <span
+						th:text="${msg.content}"></span>
+
+
+
+					<!-- 🕒 Timestamp -->
+					<br /> <small
+						th:text="${#temporals.format(msg.date, 'yyyy-MM-dd HH:mm')}"></small>
+
+					<!-- ❌ Delete Button: Only show if current user is the sender -->
+					<form th:if="${msg.sender == currentUserEmail}"
+						th:action="@{'/deleteMessage/' + ${msg.id}}" method="post"
+						style="display: inline;">
+						<button type="submit" class="btn btn-sm btn-danger ms-2">🗑
+							Delete</button>
+					</form>
+				</div>
+				<hr />
+			</div>
+
+
+		</div>
+
+
+		<form th:action="@{/sendMessage}" method="post" class="input-group"
+			enctype="multipart/form-data">
+			<input type="hidden" name="sender" th:value="${currentUserEmail}" />
+			<input type="hidden" name="receiver" th:value="${friendEmail}" /> <input
+				type="text" name="content" class="form-control"
+				placeholder="Type your message..." required="required" />
+			<button class="btn btn-primary" type="submit">Send</button>
+		</form>
+
+	</div>
+
+	<script th:src="@{/js/theme-toggle.js}"></script>
+	<script type="text/javascript">
+		function scrollToBottom() {
+			const container = document.getElementById('chat-box');
+			container.scrollTop = container.scrollHeight;
+		}
+		scrollToBottom()
+
+		// let polling = null;
+
+		// function startPolling() {
+		//     if (!polling) {
+		//         polling = setInterval(fetchMessages, 500);
+		//     }
+		// }
+
+		// function stopPolling() {
+		//     if (polling) {
+		//         clearInterval(polling);
+		//         polling = null;
+		//     }
+		// }
+
+		// async function fetchMessages() 
+		// {
+		//     const currentUserEmail = document.getElementById("currentUsermail").innerText.trim();
+		//     const otherUserEmail = document.getElementById("friendUsermail").innerText.trim();
+
+		//     try 
+		//     {
+		//         const response = await fetch(`/api/messages/${otherUserEmail}`);
+		//         const messages = await response.json();
+		//         const chatBox = document.getElementById('chat-box');
+		//         chatBox.innerHTML = '';
+
+		//         messages.forEach(msg => {
+		//             const div = document.createElement('div');
+		//             div.className = msg.sender === currentUserEmail ? 'msg-sent' : 'msg-received';
+		//             div.innerHTML = `
+		//                 <strong>${msg.sender}:</strong> ${msg.content}<br/>
+		//                 <small>${new Date(msg.date).toLocaleString()}</small>
+		//             `;
+		//             chatBox.appendChild(div);
+		//         });
+
+		// //         chatBox.scrollTop = chatBox.scrollHeight;
+		//     } catch (error) {
+		//         console.error("Failed to fetch messages:", error);
+		//     }
+		// }
+
+		// // Start polling when input is focused or user moves mouse over chat area
+		// document.querySelector('input[name="content"]').addEventListener('focus', startPolling);
+		// document.getElementById('chat-box').addEventListener('mouseenter', startPolling);
+
+		// // Stop polling when user leaves chat area
+		// document.getElementById('chat-box').addEventListener('mouseleave', stopPolling);
+
+		// // Optional: stop polling when window/tab is inactive
+		// document.addEventListener('visibilitychange', () => {
+		//     if (document.hidden) stopPolling();
+		//     else startPolling();
+		// });
+	</script>
+
+
+	<br />
+	<br />
+	<br />
+
+</body>
+</html>
