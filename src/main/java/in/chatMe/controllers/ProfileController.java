@@ -32,7 +32,8 @@ public class ProfileController {
 	private MyFriendService myFriendService;
 
 	@GetMapping("/")
-	public String signUpPage(Model model) {
+	public String signUpPage(Model model)
+    {
 		model.addAttribute("account", new Account());
 		return "signup";
 	}
